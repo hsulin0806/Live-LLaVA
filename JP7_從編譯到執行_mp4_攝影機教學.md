@@ -55,6 +55,22 @@ USB：
 ./scripts/run_video_camera.sh /data /dev/video0 /data/cam_output.mp4
 ```
 
+USB 攝影機（等價 `docker run` 版）：
+
+```bash
+docker run --rm --runtime=nvidia --network host \
+  -v /data:/data \
+  --device /dev/video0:/dev/video0 \
+  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
+  python3 -m nano_llm.vision.video \
+    --model Efficient-Large-Model/VILA1.5-3b \
+    --max-images 8 \
+    --max-new-tokens 48 \
+    --video-input /dev/video0 \
+    --video-output /data/usb_output.mp4 \
+    --prompt 'What changes occurred in the video?'
+```
+
 ## C. 常見問題
 
 - 若 CSI 失敗，先確認 `nvargus-daemon` 與相機硬體。

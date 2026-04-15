@@ -8,3 +8,12 @@
 請直接看教學：
 
 - `JP7_從編譯到執行_mp4_攝影機教學.md`
+
+
+## Quick Start (without jetson-containers runtime)
+
+```bash
+./scripts/run_video_mp4.sh /data /data/my_video.mp4 /data/my_output.mp4
+```
+
+See `JP7_從編譯到執行_mp4_攝影機教學.md` for full steps.

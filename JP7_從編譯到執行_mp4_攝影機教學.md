@@ -1,39 +1,37 @@
 # JP7 從編譯到執行（MP4 / 攝影機）
 
-> 目標：能編譯 image，並能用 `nano_llm.vision.video` 跑 MP4 或相機輸入。  
-> 適用：JetPack 7（L4T R38）+ CUDA 13.0。
+> 本專案支援兩種路徑：
+> 1) 用 `jetson-containers` 編譯 image
+> 2) **不使用 `jetson-containers`，直接用 Docker 執行**（已提供腳本）
 
-## 1) 進入建置目錄
+## A. 編譯 image（需要時）
 
 ```bash
 cd jetson-containers
-```
-
-## 2) 安裝依賴
-
-```bash
 bash install.sh
-```
-
-## 3) 編譯 nano_llm image
-
-```bash
 CUDA_VERSION=13.0 jetson-containers build nano_llm
 ```
 
-## 4) 執行 MP4 推論
+## B. 不用 jetson-containers，直接 Docker 執行（建議）
 
-先準備資料夾（把影片放進去）：
+先確認本機已有 image（預設 tag）：
 
 ```bash
-mkdir -p /data
-# 例如：/data/my_video.mp4
+docker image inspect nano_llm:r38.4.tegra-aarch64-cu130-24.04 >/dev/null
 ```
 
-執行指令（你指定的版本）：
+### MP4
 
 ```bash
-jetson-containers run $(autotag nano_llm) \
+./scripts/run_video_mp4.sh /data /data/my_video.mp4 /data/my_output.mp4
+```
+
+等價原始命令：
+
+```bash
+docker run --rm --runtime=nvidia --network host \
+  -v /data:/data \
+  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
   python3 -m nano_llm.vision.video \
     --model Efficient-Large-Model/VILA1.5-3b \
     --max-images 8 \
@@ -43,33 +41,22 @@ jetson-containers run $(autotag nano_llm) \
     --prompt 'What changes occurred in the video?'
 ```
 
-## 5) 執行攝影機推論
+### 攝影機
 
-CSI 相機範例：
-
-```bash
-jetson-containers run $(autotag nano_llm) \
-  python3 -m nano_llm.vision.video \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 48 \
-    --video-input csi://0 \
-    --video-output /data/cam_output.mp4 \
-    --prompt 'What changes occurred in the video?'
-```
-
-USB 攝影機常見可用：
+CSI：
 
 ```bash
---video-input /dev/video0
+./scripts/run_video_camera.sh /data csi://0 /data/cam_output.mp4
 ```
 
-## 6) 常見問題
-
-- 如果 `autotag nano_llm` 沒有回傳你預期的 tag，先確認 build 已成功。
-- 如果 CSI 失敗，先確認主機 `nvargus-daemon` 正常、相機可用。
-- 若需要固定已驗證 tag，可改用：
+USB：
 
 ```bash
-jetson-containers run nano_llm:r38.4.tegra-aarch64-cu130-24.04 ...
+./scripts/run_video_camera.sh /data /dev/video0 /data/cam_output.mp4
 ```
+
+## C. 常見問題
+
+- 若 CSI 失敗，先確認 `nvargus-daemon` 與相機硬體。
+- 若 image 不存在，先走 A 編譯一次。
+- 若模型首次下載較慢，第二次會走快取。

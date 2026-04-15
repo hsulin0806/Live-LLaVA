@@ -17,3 +17,6 @@
 ```
 
 See `JP7_從編譯到執行_mp4_攝影機教學.md` for full steps.
+
+
+- 部署機器可只用 Docker 執行（不用安裝 jetson-containers），詳見 `JP7_從編譯到執行_mp4_攝影機教學.md`。

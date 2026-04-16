@@ -174,10 +174,8 @@ while True:
             response_text += token
 
         response_text = remove_special_tokens(response_text).replace('\n', ' ').strip()
-        response_text = re.sub(r'^\s*\d+[\.)]\s*', '', response_text)
-        first_sentence = re.search(r'(.+?[.!?])(?:\s|$)', response_text)
-        if first_sentence:
-            response_text = first_sentence.group(1)
+        response_text = re.sub(r'^\s*(?:\d+[\).:\-]?\s*)+', '', response_text)
+        response_text = re.sub(r'\s{2,}', ' ', response_text).strip()
 
         max_chars = max(16, args.subtitle_max_chars)
         if len(response_text) > max_chars:

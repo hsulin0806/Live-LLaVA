@@ -32,7 +32,7 @@ parser.add_argument("--max-images", type=int, default=8, help="the number of vid
 parser.add_argument("--infer-interval-sec", type=float, default=3.0, help="seconds between each new inference")
 parser.add_argument("--subtitle-hold-sec", type=float, default=3.0, help="seconds to keep subtitle on screen before replacing")
 parser.add_argument("--subtitle-max-chars", type=int, default=160, help="maximum characters shown in subtitle")
-parser.add_argument("--subtitle-line-chars", type=int, default=24, help="approx characters per subtitle line")
+parser.add_argument("--subtitle-line-chars", type=int, default=0, help="approx characters per subtitle line (<=0 for auto full-width)")
 parser.add_argument("--subtitle-max-lines", type=int, default=6, help="maximum subtitle lines")
 args = parser.parse_args()
 
@@ -101,7 +101,12 @@ def split_subtitle_lines(text, line_chars=30):
     return [text[i:i+line_chars] for i in range(0, len(text), line_chars)]
 
 def draw_subtitle(image, text):
-    lines = split_subtitle_lines(text, line_chars=max(8, args.subtitle_line_chars))
+    if args.subtitle_line_chars <= 0:
+        line_chars = max(16, int((image.width - 16) / max(8, font.GetSize() * 0.55)))
+    else:
+        line_chars = max(8, args.subtitle_line_chars)
+
+    lines = split_subtitle_lines(text, line_chars=line_chars)
     if not lines:
         return
 

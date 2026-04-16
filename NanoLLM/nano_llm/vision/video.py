@@ -19,7 +19,7 @@ import time
 import logging
 
 from nano_llm import NanoLLM, ChatHistory, remove_special_tokens
-from nano_llm.utils import ArgParser, load_prompts, wrap_text
+from nano_llm.utils import ArgParser, load_prompts
 from nano_llm.plugins import VideoSource, VideoOutput
 
 from termcolor import cprint
@@ -30,6 +30,9 @@ parser = ArgParser(extras=ArgParser.Defaults + ['prompt', 'video_input', 'video_
 parser.add_argument("--max-images", type=int, default=8, help="the number of video frames to keep in the history")
 parser.add_argument("--infer-interval-sec", type=float, default=3.0, help="seconds between each new inference")
 parser.add_argument("--subtitle-hold-sec", type=float, default=3.0, help="seconds to keep subtitle on screen before replacing")
+parser.add_argument("--subtitle-max-chars", type=int, default=96, help="maximum characters shown in subtitle")
+parser.add_argument("--subtitle-line-chars", type=int, default=30, help="approx characters per subtitle line")
+parser.add_argument("--subtitle-max-lines", type=int, default=4, help="maximum subtitle lines")
 args = parser.parse_args()
 
 prompts = load_prompts(args.prompt)
@@ -70,12 +73,49 @@ last_text = ''
 last_text_time = 0.0
 last_infer_time = 0.0
 
+def split_subtitle_lines(text, line_chars=30):
+    text = (text or '').strip()
+    if not text:
+        return []
+
+    if ' ' in text:
+        words = text.split()
+        lines, line = [], ''
+        for word in words:
+            if len(line) + len(word) + (1 if line else 0) <= line_chars:
+                line = f"{line} {word}".strip()
+            else:
+                if line:
+                    lines.append(line)
+                if len(word) <= line_chars:
+                    line = word
+                else:
+                    for i in range(0, len(word), line_chars):
+                        lines.append(word[i:i+line_chars])
+                    line = ''
+        if line:
+            lines.append(line)
+        return lines
+
+    return [text[i:i+line_chars] for i in range(0, len(text), line_chars)]
+
+def draw_subtitle(image, text):
+    lines = split_subtitle_lines(text, line_chars=max(8, args.subtitle_line_chars))
+    if not lines:
+        return
+
+    y = 5
+    line_spacing = font.GetSize() + 6
+    for line in lines[:max(1, args.subtitle_max_lines)]:
+        font.OverlayText(image, text=line, x=5, y=y, color=(120,215,21), background=font.Gray50)
+        y += line_spacing
+
 def on_video(image):
     global last_image
     last_image = cudaMemcpy(image)
     if last_text and (time.time() - last_text_time) <= args.subtitle_hold_sec:
         font_text = remove_special_tokens(last_text)
-        wrap_text(font, image, text=font_text, x=5, y=5, color=(120,215,21), background=font.Gray50)
+        draw_subtitle(image, font_text)
     video_output(image)
     
 video_source = VideoSource(**vars(args), cuda_stream=0)
@@ -127,6 +167,8 @@ while True:
             cprint(token, 'blue', end='\n\n' if reply.eos else '', flush=True)
             response_text += token
 
+        response_text = remove_special_tokens(response_text).replace('\n', ' ').strip()
+        response_text = response_text[:max(16, args.subtitle_max_chars)]
         last_text = f"[{time.strftime('%H:%M:%S')}] {response_text}"
 
         last_infer_time = time.time()

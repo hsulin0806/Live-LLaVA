@@ -4,4 +4,8 @@
 
 from .hf import HFModel
 from .awq import AWQModel
-from .mlc import MLCModel
+
+try:
+    from .mlc import MLCModel
+except Exception:
+    MLCModel = None

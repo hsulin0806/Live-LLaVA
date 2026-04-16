@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-IMAGE_TAG="${IMAGE_TAG:-nano_llm:r38.4.tegra-aarch64-cu130-24.04}"
+IMAGE_TAG="${IMAGE_TAG:-nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2}"
 DATA_DIR="${1:-/data}"
 CAM_INPUT="${2:-/dev/video0}"
 VIDEO_OUTPUT="${3:-display://0}"

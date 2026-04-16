@@ -25,7 +25,17 @@ CUDA_VERSION=13.0 jetson-containers build nano_llm
 ```
 
 預設使用：
-- `nano_llm:r38.4.tegra-aarch64-cu130-24.04`
+- `nano_llm:r38.4.tegra-aarch64-cu130-24.04`（base）
+
+為了內建 `--infer-interval-sec` / `--subtitle-*` 參數（不需本機掛載程式碼），請再建立 v2 tag：
+
+```bash
+cd NanoLLM
+docker build -t nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 -f Dockerfile.overlay .
+```
+
+後續執行請優先使用：
+- `nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2`
 
 ---
 
@@ -39,7 +49,7 @@ docker run --runtime=nvidia --network host --ipc=host \
   -e TOKENIZERS_PARALLELISM=false \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
+  nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
   python3 -m nano_llm.vision.video \
     --api hf \
     --model Efficient-Large-Model/VILA1.5-3b \
@@ -68,7 +78,7 @@ docker run --runtime=nvidia --network host --ipc=host \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
   --device /dev/video0:/dev/video0 \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
+  nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
   python3 -m nano_llm.vision.video \
     --api hf \
     --model Efficient-Large-Model/VILA1.5-3b \
@@ -91,13 +101,13 @@ docker run --runtime=nvidia --network host --ipc=host \
 建置機器匯出 image：
 
 ```bash
-docker save nano_llm:r38.4.tegra-aarch64-cu130-24.04 | gzip > nano_llm-r38.4-cu130.tar.gz
+docker save nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 | gzip > nano_llm-r38.4-cu130-v2.tar.gz
 ```
 
 目標機器匯入 image：
 
 ```bash
-gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
+gunzip -c nano_llm-r38.4-cu130-v2.tar.gz | docker load
 ```
 
 匯入後直接跑第 2 或第 3 節的 `docker run` 指令即可。
@@ -115,6 +125,7 @@ gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
   ```
 - CSI 相機不是 USB，請改用 `csi://0` 並確認 `nvargus-daemon` 正常。
 - 首次模型下載較慢，第二次會走快取。
+- 如果看到 `unrecognized arguments: --infer-interval-sec ...`，代表你使用的是舊 image，請改用 `...-v2`。
 
 ---
 

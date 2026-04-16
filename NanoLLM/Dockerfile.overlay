@@ -1,0 +1,4 @@
+FROM nano_llm:r38.4.tegra-aarch64-cu130-24.04
+
+# Bake latest NanoLLM code into image so runtime doesn't need host bind-mounts
+COPY . /opt/NanoLLM

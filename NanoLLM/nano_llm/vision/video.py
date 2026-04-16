@@ -17,6 +17,7 @@
 #
 import time
 import logging
+import re
 
 from nano_llm import NanoLLM, ChatHistory, remove_special_tokens
 from nano_llm.utils import ArgParser, load_prompts
@@ -30,9 +31,9 @@ parser = ArgParser(extras=ArgParser.Defaults + ['prompt', 'video_input', 'video_
 parser.add_argument("--max-images", type=int, default=8, help="the number of video frames to keep in the history")
 parser.add_argument("--infer-interval-sec", type=float, default=3.0, help="seconds between each new inference")
 parser.add_argument("--subtitle-hold-sec", type=float, default=3.0, help="seconds to keep subtitle on screen before replacing")
-parser.add_argument("--subtitle-max-chars", type=int, default=96, help="maximum characters shown in subtitle")
-parser.add_argument("--subtitle-line-chars", type=int, default=30, help="approx characters per subtitle line")
-parser.add_argument("--subtitle-max-lines", type=int, default=4, help="maximum subtitle lines")
+parser.add_argument("--subtitle-max-chars", type=int, default=160, help="maximum characters shown in subtitle")
+parser.add_argument("--subtitle-line-chars", type=int, default=24, help="approx characters per subtitle line")
+parser.add_argument("--subtitle-max-lines", type=int, default=6, help="maximum subtitle lines")
 args = parser.parse_args()
 
 prompts = load_prompts(args.prompt)
@@ -168,7 +169,18 @@ while True:
             response_text += token
 
         response_text = remove_special_tokens(response_text).replace('\n', ' ').strip()
-        response_text = response_text[:max(16, args.subtitle_max_chars)]
+        response_text = re.sub(r'^\s*\d+[\.)]\s*', '', response_text)
+        first_sentence = re.search(r'(.+?[.!?])(?:\s|$)', response_text)
+        if first_sentence:
+            response_text = first_sentence.group(1)
+
+        max_chars = max(16, args.subtitle_max_chars)
+        if len(response_text) > max_chars:
+            response_text = response_text[:max_chars]
+            if ' ' in response_text:
+                response_text = response_text.rsplit(' ', 1)[0]
+            response_text = response_text + '...'
+
         last_text = f"[{time.strftime('%H:%M:%S')}] {response_text}"
 
         last_infer_time = time.time()

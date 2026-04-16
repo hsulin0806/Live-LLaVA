@@ -105,6 +105,8 @@ while True:
     num_images += 1
 
     for prompt in prompts:
+        last_text = f"[{time.strftime('%H:%M:%S')}] infer..."
+        last_text_time = time.time()
         chat_history.append('user', prompt)
         embedding, _ = chat_history.embed_chat()
         
@@ -120,12 +122,12 @@ while True:
             top_p=args.top_p,
         )
         
+        response_text = ''
         for token in reply:
             cprint(token, 'blue', end='\n\n' if reply.eos else '', flush=True)
-            if len(reply.tokens) == 1:
-                last_text = token
-            else:
-                last_text = last_text + token
+            response_text += token
+
+        last_text = f"[{time.strftime('%H:%M:%S')}] {response_text}"
 
         last_infer_time = time.time()
         last_text_time = last_infer_time

@@ -112,7 +112,6 @@ while True:
         
         reply = model.generate(
             embedding,
-            kv_cache=chat_history.kv_cache,
             max_new_tokens=args.max_new_tokens,
             min_new_tokens=args.min_new_tokens,
             do_sample=args.do_sample,

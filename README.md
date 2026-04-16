@@ -32,16 +32,28 @@ CUDA_VERSION=13.0 jetson-containers build nano_llm
 ## 2) MP4 推論（docker run）
 
 ```bash
-docker run --rm --runtime=nvidia --network host \
+docker run --runtime=nvidia --network host --ipc=host \
+  --ulimit memlock=-1 --ulimit stack=67108864 \
+  -e DISPLAY=:1 \
+  -e QT_X11_NO_MITSHM=1 \
+  -e TOKENIZERS_PARALLELISM=false \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
+  -v /home/adv/.openclaw/workspace/nano_llm-unified/NanoLLM:/opt/NanoLLM \
   nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
   python3 -m nano_llm.vision.video \
+    --api hf \
     --model Efficient-Large-Model/VILA1.5-3b \
     --max-images 8 \
-    --max-new-tokens 48 \
+    --max-new-tokens 64 \
     --video-input /data/my_video.mp4 \
-    --video-output /data/my_output.mp4 \
-    --prompt 'What changes occurred in the video?'
+    --video-output display://0 \
+    --prompt 'What changes occurred in the video?' \
+    --infer-interval-sec 2.5 \
+    --subtitle-hold-sec 2.5 \
+    --subtitle-max-chars 220 \
+    --subtitle-line-chars 0 \
+    --subtitle-max-lines 4
 ```
 
 ---
@@ -49,17 +61,29 @@ docker run --rm --runtime=nvidia --network host \
 ## 3) USB 攝影機推論（docker run）
 
 ```bash
-docker run --rm --runtime=nvidia --network host \
+docker run --runtime=nvidia --network host --ipc=host \
+  --ulimit memlock=-1 --ulimit stack=67108864 \
+  -e DISPLAY=:1 \
+  -e QT_X11_NO_MITSHM=1 \
+  -e TOKENIZERS_PARALLELISM=false \
+  -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
+  -v /home/adv/.openclaw/workspace/nano_llm-unified/NanoLLM:/opt/NanoLLM \
   --device /dev/video0:/dev/video0 \
   nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
   python3 -m nano_llm.vision.video \
+    --api hf \
     --model Efficient-Large-Model/VILA1.5-3b \
     --max-images 8 \
-    --max-new-tokens 48 \
+    --max-new-tokens 64 \
     --video-input /dev/video0 \
-    --video-output /data/usb_output.mp4 \
-    --prompt 'What changes occurred in the video?'
+    --video-output display://0 \
+    --prompt 'What changes occurred in the video?' \
+    --infer-interval-sec 2.5 \
+    --subtitle-hold-sec 2.5 \
+    --subtitle-max-chars 220 \
+    --subtitle-line-chars 0 \
+    --subtitle-max-lines 4
 ```
 
 ---

@@ -39,7 +39,6 @@ docker run --runtime=nvidia --network host --ipc=host \
   -e TOKENIZERS_PARALLELISM=false \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
-  -v /home/adv/.openclaw/workspace/nano_llm-unified/NanoLLM:/opt/NanoLLM \
   nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
   python3 -m nano_llm.vision.video \
     --api hf \
@@ -68,7 +67,6 @@ docker run --runtime=nvidia --network host --ipc=host \
   -e TOKENIZERS_PARALLELISM=false \
   -v /tmp/.X11-unix:/tmp/.X11-unix \
   -v /data:/data \
-  -v /home/adv/.openclaw/workspace/nano_llm-unified/NanoLLM:/opt/NanoLLM \
   --device /dev/video0:/dev/video0 \
   nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
   python3 -m nano_llm.vision.video \
@@ -103,6 +101,9 @@ gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
 ```
 
 匯入後直接跑第 2 或第 3 節的 `docker run` 指令即可。
+
+> 備註：跨機部署時，**不要**帶本機開發路徑掛載（例如 `-v /home/.../NanoLLM:/opt/NanoLLM`）。
+> 那個只適用於你要在本機即時覆蓋程式碼測試。
 
 ---
 

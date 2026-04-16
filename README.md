@@ -125,13 +125,18 @@ gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
 
 - `--model Efficient-Large-Model/VILA1.5-3b`
   - 指定使用的 VLM 模型。
-  - 常用可選（VLM）例如：
+  - 支援的 VLM（本專案整理）
+    - `liuhaotian/llava-v1.5-7b`
+    - `liuhaotian/llava-v1.5-13b`
+    - `liuhaotian/llava-v1.6-vicuna-7b`
+    - `liuhaotian/llava-v1.6-vicuna-13b`
+    - `NousResearch/Obsidian-3B-V0.5`
+    - `Efficient-Large-Model/VILA-2.7b`
+    - `Efficient-Large-Model/VILA-7b`
+    - `Efficient-Large-Model/VILA-13b`
     - `Efficient-Large-Model/VILA1.5-3b`
     - `Efficient-Large-Model/Llama-3-VILA1.5-8b`
     - `Efficient-Large-Model/VILA1.5-13b`
-    - `liuhaotian/llava-v1.5-7b`
-    - `liuhaotian/llava-v1.6-vicuna-7b`
-  - 更多已測模型可參考：`NanoLLM/docs/models.md`
 
 - `--max-images 8`
   - 保留最近 8 張影格做上下文，適合「變化偵測」類 prompt。

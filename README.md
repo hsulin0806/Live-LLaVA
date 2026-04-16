@@ -118,6 +118,46 @@ gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
 
 ---
 
+## 6) 常用參數說明（`python3 -m nano_llm.vision.video`）
+
+- `--api hf`
+  - 使用 Hugging Face 後端載入模型。
+
+- `--model Efficient-Large-Model/VILA1.5-3b`
+  - 指定使用的 VLM 模型。
+
+- `--max-images 8`
+  - 保留最近 8 張影格做上下文，適合「變化偵測」類 prompt。
+
+- `--max-new-tokens 64`
+  - 每次回覆最多生成 token 數。越大通常可輸出更長句子，但延遲也可能增加。
+
+- `--video-input /dev/video0`
+  - 輸入來源。可用 USB 攝影機（`/dev/video0`）或 MP4 路徑（如 `/data/my_video.mp4`）。
+
+- `--video-output display://0`
+  - 將影像輸出到桌面視窗。若要輸出影片檔，可改成 `/data/output.mp4`。
+
+- `--prompt 'What changes occurred in the video?'`
+  - 每輪推論問題。可改成你要的描述風格。
+
+- `--infer-interval-sec 2.5`
+  - 每隔幾秒觸發一次新推論（控制更新頻率）。
+
+- `--subtitle-hold-sec 2.5`
+  - 字幕停留秒數。時間到後由下一次推論結果覆蓋。
+
+- `--subtitle-max-chars 220`
+  - 單次字幕最多顯示字元數，避免超長輸出塞爆畫面。
+
+- `--subtitle-line-chars 0`
+  - 每行字數上限；`0` 代表自動依畫面寬度換行（先盡量從左上到右上）。
+
+- `--subtitle-max-lines 4`
+  - 字幕最多顯示行數，超過會截斷。
+
+---
+
 ## 補充
 
 如果你要看更完整版本（含腳本與補充說明），請看：

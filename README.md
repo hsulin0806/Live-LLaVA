@@ -99,3 +99,4 @@ gunzip -c nano_llm-r38.4-cu130.tar.gz | docker load
 - `JP7_從編譯到執行_mp4_攝影機教學.md`
 - `scripts/run_video_mp4.sh`
 - `scripts/run_video_camera.sh`
+- `PROJECT_EXPERIENCE.md`（給新助理/新開發者的延續開發記憶）

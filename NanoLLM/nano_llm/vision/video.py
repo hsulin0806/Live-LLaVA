@@ -28,6 +28,8 @@ from jetson_utils import cudaMemcpy, cudaToNumpy, cudaFont
 # parse args and set some defaults
 parser = ArgParser(extras=ArgParser.Defaults + ['prompt', 'video_input', 'video_output'])
 parser.add_argument("--max-images", type=int, default=8, help="the number of video frames to keep in the history")
+parser.add_argument("--infer-interval-sec", type=float, default=3.0, help="seconds between each new inference")
+parser.add_argument("--subtitle-hold-sec", type=float, default=3.0, help="seconds to keep subtitle on screen before replacing")
 args = parser.parse_args()
 
 prompts = load_prompts(args.prompt)
@@ -65,11 +67,13 @@ chat_history.reset()
 num_images = 0
 last_image = None
 last_text = ''
+last_text_time = 0.0
+last_infer_time = 0.0
 
 def on_video(image):
     global last_image
     last_image = cudaMemcpy(image)
-    if last_text:
+    if last_text and (time.time() - last_text_time) <= args.subtitle_hold_sec:
         font_text = remove_special_tokens(last_text)
         wrap_text(font, image, text=font_text, x=5, y=5, color=(120,215,21), background=font.Gray50)
     video_output(image)
@@ -86,6 +90,12 @@ font = cudaFont()
 # apply the prompts to each frame
 while True:
     if last_image is None:
+        time.sleep(0.005)
+        continue
+
+    now = time.time()
+    if (now - last_infer_time) < args.infer_interval_sec:
+        time.sleep(0.005)
         continue
 
     chat_history.append('user', text=f'Image {num_images + 1}:')
@@ -117,6 +127,9 @@ while True:
                 last_text = token
             else:
                 last_text = last_text + token
+
+        last_infer_time = time.time()
+        last_text_time = last_infer_time
 
         chat_history.append('bot', reply)
         chat_history.pop(2)

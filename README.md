@@ -23,9 +23,9 @@ Upstream project: <https://github.com/hsulin0806/nano_llm-unified>
 
 ## Supported Platform
 
-| Platform | Hardware Spec | OS | Runtime |
+| Platform | Hardware Spec | OS | Edge AI SDK |
 |---|---|---|---|
-| NVIDIA Jetson family | Jetson device with GPU acceleration | JetPack 7 / Ubuntu 24.04 | Docker + NVIDIA runtime |
+| AIR-075 | NVIDIA Jetson Thor - RAM: 128/64 GB, Storage: 512 GB | JetPack 7.1 | [Install](https://docs.edge-ai-sdk.advantech.com/docs/Hardware/AI_System/Nvidia/Jetson%20Thor/AIR-075) |
 
 ---
 

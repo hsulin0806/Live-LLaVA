@@ -66,53 +66,20 @@ docker build -t nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 -f Dockerfile.overla
 
 ## Setup 2: Run MP4 inference
 ```bash
-docker run --runtime=nvidia --network host --ipc=host \
-  --ulimit memlock=-1 --ulimit stack=67108864 \
-  -e DISPLAY=:1 \
-  -e QT_X11_NO_MITSHM=1 \
-  -e TOKENIZERS_PARALLELISM=false \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /data:/data \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
-  python3 -m nano_llm.vision.video \
-    --api hf \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 64 \
-    --video-input /data/my_video.mp4 \
-    --video-output display://0 \
-    --prompt 'What changes occurred in the video?' \
-    --infer-interval-sec 2.5 \
-    --subtitle-hold-sec 2.5 \
-    --subtitle-max-chars 220 \
-    --subtitle-line-chars 0 \
-    --subtitle-max-lines 4
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+INPUT_MP4=/data/my_video.mp4 \
+VIDEO_OUTPUT=display://0 \
+docker compose -f docker-compose.mp4.yml up -d
 ```
 
 ## Setup 3: Run USB camera inference
 ```bash
-docker run --runtime=nvidia --network host --ipc=host \
-  --ulimit memlock=-1 --ulimit stack=67108864 \
-  -e DISPLAY=:1 \
-  -e QT_X11_NO_MITSHM=1 \
-  -e TOKENIZERS_PARALLELISM=false \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /data:/data \
-  --device /dev/video0:/dev/video0 \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
-  python3 -m nano_llm.vision.video \
-    --api hf \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 64 \
-    --video-input /dev/video0 \
-    --video-output display://0 \
-    --prompt 'What changes occurred in the video?' \
-    --infer-interval-sec 2.5 \
-    --subtitle-hold-sec 2.5 \
-    --subtitle-max-chars 220 \
-    --subtitle-line-chars 0 \
-    --subtitle-max-lines 4
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+CAM_INPUT=/dev/video0 \
+VIDEO_OUTPUT=display://0 \
+docker compose -f docker-compose.camera.yml up -d
 ```
 
 ## Result

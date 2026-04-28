@@ -1,0 +1,46 @@
+services:
+  live-llava-camera:
+    image: ${IMAGE_TAG:-nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2}
+    runtime: nvidia
+    network_mode: host
+    ipc: host
+    ulimits:
+      memlock: -1
+      stack: 67108864
+    environment:
+      DISPLAY: ${DISPLAY:-:1}
+      QT_X11_NO_MITSHM: "1"
+      TOKENIZERS_PARALLELISM: "false"
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - ${DATA_DIR:-/data}:/data
+    devices:
+      - /dev/video0:/dev/video0
+    command:
+      - python3
+      - -m
+      - nano_llm.vision.video
+      - --api
+      - hf
+      - --model
+      - ${MODEL:-Efficient-Large-Model/VILA1.5-3b}
+      - --max-images
+      - "8"
+      - --max-new-tokens
+      - "64"
+      - --video-input
+      - ${CAM_INPUT:-/dev/video0}
+      - --video-output
+      - ${VIDEO_OUTPUT:-display://0}
+      - --prompt
+      - ${PROMPT:-What changes occurred in the video?}
+      - --infer-interval-sec
+      - "2.5"
+      - --subtitle-hold-sec
+      - "2.5"
+      - --subtitle-max-chars
+      - "220"
+      - --subtitle-line-chars
+      - "0"
+      - --subtitle-max-lines
+      - "4"

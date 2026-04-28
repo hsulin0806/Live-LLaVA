@@ -2,7 +2,7 @@
 
 > 本專案支援兩種路徑：
 > 1) 用 `jetson-containers` 編譯 image
-> 2) **不使用 `jetson-containers`，直接用 Docker 執行**（已提供腳本）
+> 2) **不使用 `jetson-containers`，直接用 Docker Compose 執行**（已提供腳本）
 
 ## A. 編譯 image（需要時）
 
@@ -12,7 +12,7 @@ bash install.sh
 CUDA_VERSION=13.0 jetson-containers build nano_llm
 ```
 
-## B. 不用 jetson-containers，直接 Docker 執行（建議）
+## B. 不用 jetson-containers，直接 Docker Compose 執行（建議）
 
 先確認本機已有 image（預設 tag）：
 
@@ -26,19 +26,14 @@ docker image inspect nano_llm:r38.4.tegra-aarch64-cu130-24.04 >/dev/null
 ./scripts/run_video_mp4.sh /data /data/my_video.mp4 /data/my_output.mp4
 ```
 
-等價原始命令：
+等價 `docker compose up -d`：
 
 ```bash
-docker run --rm --runtime=nvidia --network host \
-  -v /data:/data \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
-  python3 -m nano_llm.vision.video \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 48 \
-    --video-input /data/my_video.mp4 \
-    --video-output /data/my_output.mp4 \
-    --prompt 'What changes occurred in the video?'
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+INPUT_MP4=/data/my_video.mp4 \
+VIDEO_OUTPUT=/data/my_output.mp4 \
+docker compose -f docker-compose.mp4.yml up -d
 ```
 
 ### 攝影機
@@ -55,20 +50,14 @@ USB：
 ./scripts/run_video_camera.sh /data /dev/video0 /data/cam_output.mp4
 ```
 
-USB 攝影機（等價 `docker run` 版）：
+USB 攝影機（等價 `docker compose up -d`）：
 
 ```bash
-docker run --rm --runtime=nvidia --network host \
-  -v /data:/data \
-  --device /dev/video0:/dev/video0 \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
-  python3 -m nano_llm.vision.video \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 48 \
-    --video-input /dev/video0 \
-    --video-output /data/usb_output.mp4 \
-    --prompt 'What changes occurred in the video?'
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+CAM_INPUT=/dev/video0 \
+VIDEO_OUTPUT=/data/usb_output.mp4 \
+docker compose -f docker-compose.camera.yml up -d
 ```
 
 ## C. 常見問題
@@ -100,19 +89,14 @@ scp nano_llm-r38.4-cu130.tar.gz user@TARGET:/tmp/
 gunzip -c /tmp/nano_llm-r38.4-cu130.tar.gz | docker load
 ```
 
-### 4) 目標機器直接 docker run
+### 4) 目標機器直接 docker compose up -d
 
 ```bash
-docker run --rm --runtime=nvidia --network host \
-  -v /data:/data \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
-  python3 -m nano_llm.vision.video \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 48 \
-    --video-input /data/my_video.mp4 \
-    --video-output /data/my_output.mp4 \
-    --prompt 'What changes occurred in the video?'
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+INPUT_MP4=/data/my_video.mp4 \
+VIDEO_OUTPUT=/data/my_output.mp4 \
+docker compose -f docker-compose.mp4.yml up -d
 ```
 
 > 重點：**部署機器不用安裝 jetson-containers**。

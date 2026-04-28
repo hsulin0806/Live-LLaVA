@@ -6,7 +6,7 @@
 
 - 平台：**JetPack 7 / L4T R38 + CUDA 13.0 only**
 - 影像流程：MP4 + USB Camera 可跑
-- 部署：目標機可只用 `docker run`，不依賴 `jetson-containers` 安裝
+- 部署：目標機可只用 `docker compose up -d`，不依賴 `jetson-containers` 安裝
 - 首次可下載模型，第二次可吃快取離線啟動
 
 ## 已驗證可用的核心 image
@@ -45,27 +45,11 @@
 ## 現行常用啟動範本（桌面顯示 + USB）
 
 ```bash
-docker run --runtime=nvidia --network host --ipc=host \
-  --ulimit memlock=-1 --ulimit stack=67108864 \
-  -e DISPLAY=:1 -e QT_X11_NO_MITSHM=1 -e TOKENIZERS_PARALLELISM=false \
-  -v /tmp/.X11-unix:/tmp/.X11-unix \
-  -v /data:/data \
-  -v /home/adv/.openclaw/workspace/nano_llm-unified/NanoLLM:/opt/NanoLLM \
-  --device /dev/video0:/dev/video0 \
-  nano_llm:r38.4.tegra-aarch64-cu130-24.04 \
-  python3 -m nano_llm.vision.video \
-    --api hf \
-    --model Efficient-Large-Model/VILA1.5-3b \
-    --max-images 8 \
-    --max-new-tokens 64 \
-    --video-input /dev/video0 \
-    --video-output display://0 \
-    --prompt 'What changes occurred in the video?' \
-    --infer-interval-sec 2.5 \
-    --subtitle-hold-sec 2.5 \
-    --subtitle-max-chars 220 \
-    --subtitle-line-chars 0 \
-    --subtitle-max-lines 4
+IMAGE_TAG=nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 \
+DATA_DIR=/data \
+CAM_INPUT=/dev/video0 \
+VIDEO_OUTPUT=display://0 \
+docker compose -f docker-compose.camera.yml up -d
 ```
 
 ## 接手者建議順序

@@ -6,6 +6,10 @@ Upstream project: <https://github.com/hsulin0806/nano_llm-unified>
 
 - **Category**: General Edge Vision AI
 
+<p align="center">
+  <img src="assets/video_vila_wildfire.gif" width="70%" />
+</p>
+
 ---
 
 ## Live-LLaVA
@@ -111,28 +115,10 @@ docker run --runtime=nvidia --network host --ipc=host \
     --subtitle-max-lines 4
 ```
 
-## Setup 4: Cross-device deployment (optional)
-Build machine export:
-```bash
-docker save nano_llm:r38.4.tegra-aarch64-cu130-24.04-v2 | gzip > nano_llm-r38.4-cu130-v2.tar.gz
-```
-
-Target machine import:
-```bash
-gunzip -c nano_llm-r38.4-cu130-v2.tar.gz | docker load
-```
-
 ## Result
 - MP4 mode: infer and subtitle output in display window.
 - USB camera mode: live scene caption updates at configured interval.
 
----
-
-## Notes
-
-- If `/dev/video0` does not exist:
-  ```bash
-  ls -l /dev/video*
-  ```
-- If you see `unrecognized arguments: --infer-interval-sec ...`, use the `...-v2` image tag.
-- First-time model download can take longer due to cache warm-up.
+<p align="center">
+  <img src="assets/video_vila_wildfire.gif" width="70%" />
+</p>

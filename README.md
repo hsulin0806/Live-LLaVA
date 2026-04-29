@@ -2,7 +2,7 @@
 
 Live-LLaVA provides prompt-driven video understanding for edge devices, supporting both MP4 files and USB camera streams with real-time subtitle output.
 
-Upstream project: <[https://github.com/hsulin0806/nano_llm-unified](https://www.jetson-ai-lab.com/archive/tutorial_live-llava.html)>
+Upstream project: <https://www.jetson-ai-lab.com/archive/tutorial_live-llava.html>
 
 - **Category**: General Edge Vision AI
 

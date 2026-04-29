@@ -12,18 +12,16 @@ Upstream project: <https://github.com/hsulin0806/nano_llm-unified>
 
 ---
 
-## Live-LLaVA
-
 ## LLaVA
 
-* Multimodal Visual-Language Understanding  
-Combines visual input with natural language prompts for scene understanding, caption generation, and question answering.
+* LLaVA (Large Language and Vision Assistant)
+Combines visual input with a large language model, enabling general-purpose visual-language understanding for captioning, question answering, and scene interpretation.
 
-* Live Video / Camera Inference Pipeline  
-Supports continuous inference from MP4 files and live USB camera streams, enabling real-time subtitle-style scene description on edge devices.
+* Streaming Video Inference Pipeline
+Supports continuous inference from MP4 files and live USB camera streams, enabling real-time scene understanding on edge devices.
 
-* Edge Deployment Optimization  
-Provides a Docker-based deployment flow for JetPack 7 / CUDA 13 environments, improving portability and simplifying setup on Jetson platforms.
+* Edge Deployment Optimization
+Uses Docker-based deployment on JetPack 7 / CUDA 13 platforms to improve portability and simplify deployment across Jetson devices.
 
 ## Supported Platform
 
